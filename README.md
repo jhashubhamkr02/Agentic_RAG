@@ -1,52 +1,50 @@
-Agentic_RAG
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Agentic RAG System with LlamaIndex, Gemini, and Hugging Face Embeddings
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Overview
+# Agentic RAG
 
-This repository contains an Agentic Retrieval-Augmented Generation (RAG) system built using LlamaIndex, Gemini, and Hugging Face embeddings. The system efficiently retrieves relevant documents and enhances LLM responses by integrating knowledge from external sources.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Features
+An Agentic Retrieval-Augmented Generation (RAG) system built with **LlamaIndex**, **Gemini**, and **Hugging Face embeddings**. Instead of a fixed retrieve-then-generate pipeline, an LLM-driven router decides — per query — whether to run vector retrieval (for specific, fact-based questions) or a summarization pass (for broad, whole-document questions).
 
-Smart Query Handling – Dynamically chooses the best method (retrieval or summarization) instead of blindly fetching documents.
+## Features
+- **Smart Query Handling** — an `LLMSingleSelector` picks between a vector retrieval engine and a summarization engine based on the query itself.
+- **Better Efficiency** — narrow questions skip full-document summarization.
+- **Higher Adaptability** — broad "summarize this" questions get a tree-summarize pass instead of a handful of possibly-irrelevant chunks.
+- **Improved Accuracy** — matching retrieval strategy to query type reduces the chance of answering from the wrong context.
 
-Better Efficiency – Reduces unnecessary retrievals, making responses faster and more relevant.
+## Tech Stack
+- **LlamaIndex** — document indexing, vector + summary indices, query routing
+- **Gemini API** (`gemini-2.0-flash` via `llama-index-llms-google-genai`) — generation and route selection
+- **Hugging Face `sentence-transformers/all-MiniLM-L6-v2`** — embeddings
+- **Streamlit** — UI
 
-Higher Adaptability – Adjusts responses based on different types of queries rather than following a rigid retrieval structure.
+## Project Structure
+```
+app.py                  Streamlit UI
+src/loader.py            Document loading (PDF/txt/docx)
+src/embeddings.py        Hugging Face embedding model
+src/llm.py                Gemini LLM wrapper
+src/router.py             Agentic RouterQueryEngine (vector vs. summary)
+```
 
-Improved Accuracy – Prevents hallucinations by ensuring that only the most relevant information is used for generation.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Tech Stack
+## Setup
 
-LlamaIndex: For document indexing and retrieval.
+```bash
+python -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-Gemini API: For generative responses.
+Set your Gemini API key (get one from Google AI Studio):
 
-Hugging Face Transformers: For embedding-based retrieval.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-Usage
-
-Set up API keys:
-
-Obtain your Gemini API key from Google.
-
-Set environment variables:
-
+```bash
 export GEMINI_API_KEY='your-api-key'
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Example Query
+```
 
-User Input: "What is Retrieval-Augmented Generation?"
+## Run
 
-System Response: "Retrieval-Augmented Generation (RAG) is a framework that enhances LLM outputs by fetching relevant external documents..."
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Contributing
+```bash
+streamlit run app.py
+```
 
-Feel free to open issues, submit PRs, or suggest improvements!
+Upload a PDF, then ask a question. Try one narrow question ("What does X say about Y?") and one broad question ("Summarize this document") to see the router pick different strategies — expand the "Which strategy did the agent pick?" panel under the answer.
 
-License
-
-This project is licensed under the MIT License.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-🚀 Happy Coding!
+## Notes
+- This replaces an earlier, simpler version of this app that used a single fixed LangChain retrieval chain with a local `flan-t5-small` model and no routing logic. This version adds the LLM-based routing decision and switches generation to Gemini.
+- No hard-coded benchmark numbers are claimed here — if you want defensible metrics (latency, retrieval accuracy) for a resume, run this against a small labeled test set and record the actual numbers before quoting them.
