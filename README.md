@@ -44,7 +44,3 @@ streamlit run app.py
 ```
 
 Upload a PDF, then ask a question. Try one narrow question ("What does X say about Y?") and one broad question ("Summarize this document") to see the router pick different strategies — expand the "Which strategy did the agent pick?" panel under the answer.
-
-## Notes
-- This replaces an earlier, simpler version of this app that used a single fixed LangChain retrieval chain with a local `flan-t5-small` model and no routing logic. This version adds the LLM-based routing decision and switches generation to Gemini.
-- No hard-coded benchmark numbers are claimed here — if you want defensible metrics (latency, retrieval accuracy) for a resume, run this against a small labeled test set and record the actual numbers before quoting them.
